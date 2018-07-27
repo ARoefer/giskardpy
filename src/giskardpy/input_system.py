@@ -89,6 +89,37 @@ class FrameInput(InputArray):
         return sw.rotation3_quaternion(self.qx, self.qy, self.qz, self.qw)
 
 
+class FrameInputRPY(InputArray):
+    def __init__(self, x='', y='', z='', rr='', rp='', ry=''):
+        super(FrameInputRPY, self).__init__(x=x, y=y, z=z, rr=rr, rp=rp, ry=ry)
+
+    @classmethod
+    def prefix_constructor(self, point_prefix, orientation_prefix, f):
+        if isinstance(point_prefix, str):
+            return self(x=f('{}/x'.format(point_prefix)),
+                        y=f('{}/y'.format(point_prefix)),
+                        z=f('{}/z'.format(point_prefix)),
+                        rr=f('{}/r'.format(orientation_prefix)),
+                        rp=f('{}/p'.format(orientation_prefix)),
+                        ry=f('{}/y'.format(orientation_prefix)))
+        else:
+            return self(x=f(point_prefix + ['x']),
+                        y=f(point_prefix + ['y']),
+                        z=f(point_prefix + ['z']),
+                        rr=f(orientation_prefix + ['r']),
+                        rp=f(orientation_prefix + ['p']),
+                        ry=f(orientation_prefix + ['y']))
+
+    def get_expression(self):
+        return sw.frame3_rpy(self.rr, self.rp, self.ry, [self.x, self.y, self.z])
+
+    def get_position(self):
+        return sw.point3(self.x, self.y, self.z)
+
+    def get_rotation(self):
+        return sw.rotation3_rpy(self.rr, self.rp, self.ry)
+
+
 class ShortestAngularDistanceInput(object):
     def __init__(self, f, prefix, current_angle, goal_angle):
         self.current_angle = current_angle

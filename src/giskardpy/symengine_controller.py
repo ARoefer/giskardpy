@@ -1,5 +1,6 @@
 import symengine_wrappers as sw
 from collections import OrderedDict
+from giskardpy import print_wrapper
 from giskardpy.qp_problem_builder import QProblemBuilder, SoftConstraint
 from giskardpy.symengine_robot import Robot
 
@@ -30,13 +31,14 @@ class SymEngineController(object):
         self.hard_constraints = OrderedDict(((self.robot.get_name(), k), self.robot.hard_constraints[k]) for k in
                                             self.controlled_joints if k in self.robot.hard_constraints)
 
-    def init(self, soft_constraints, free_symbols):
+    def init(self, soft_constraints, free_symbols, print_fn=print_wrapper):
         self.qp_problem_builder = QProblemBuilder(self.joint_constraints,
                                                   self.hard_constraints,
                                                   soft_constraints,
                                                   self.controlled_joint_symbols,
                                                   free_symbols,
-                                                  self.path_to_functions)
+                                                  self.path_to_functions,
+                                                  print_fn)
 
     def get_controlled_joints(self):
         return list(self.robot.joint_states_input.joint_map.keys())

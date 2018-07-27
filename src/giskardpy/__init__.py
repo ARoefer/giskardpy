@@ -8,3 +8,6 @@ USE_SYMENGINE = True
 
 BACKEND = 'llvm'
 # BACKEND = 'lambda'
+
+def print_wrapper(msg):
+    print(msg)

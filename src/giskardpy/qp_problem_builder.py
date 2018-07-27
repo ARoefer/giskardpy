@@ -1,15 +1,15 @@
-import pickle
-from collections import OrderedDict, namedtuple
+import giskardpy.symengine_wrappers as spw
+import hashlib
 import numpy as np
+import pickle
+
+from collections import OrderedDict, namedtuple
 from itertools import chain
 from time import time
 
 from giskardpy import BACKEND
-
-import giskardpy.symengine_wrappers as spw
+from giskardpy import print_wrapper
 from giskardpy.qp_solver import QPSolver
-import hashlib
-
 from giskardpy.symengine_wrappers import load_compiled_function, safe_compiled_function
 
 SoftConstraint = namedtuple('SoftConstraint', ['lower', 'upper', 'weight', 'expression'])
@@ -21,7 +21,7 @@ BIG_NUMBER = 1e9
 
 class QProblemBuilder(object):
     def __init__(self, joint_constraints_dict, hard_constraints_dict, soft_constraints_dict, controlled_joint_symbols,
-                 free_symbols=None, path_to_functions=''):
+                 free_symbols=None, path_to_functions='', print_fn=print_wrapper):
         assert (not len(controlled_joint_symbols) > len(joint_constraints_dict))
         assert (not len(controlled_joint_symbols) < len(joint_constraints_dict))
         assert (len(hard_constraints_dict) <= len(controlled_joint_symbols))
@@ -39,6 +39,7 @@ class QProblemBuilder(object):
 
         self.qp_solver = QPSolver(len(self.joint_constraints_dict) + len(self.soft_constraints_dict),
                                   len(self.hard_constraints_dict) + len(self.soft_constraints_dict))
+        self.__print_fn = print_fn
 
     # @profile
     def make_sympy_matrices(self):
@@ -75,7 +76,7 @@ class QProblemBuilder(object):
         self.np_g = np.zeros(len(weights))
 
         if self.cython_big_ass_M is None:
-            print('new controller requested; compiling')
+            self.__print_fn('new controller requested; compiling')
             self.H = spw.diag(*weights)
 
             self.lb = spw.Matrix(lb)
@@ -93,7 +94,7 @@ class QProblemBuilder(object):
             A_soft = spw.Matrix(soft_expressions)
             t = time()
             A_soft = A_soft.jacobian(M_controlled_joints)
-            print('jacobian took {}'.format(time() - t))
+            self.__print_fn('jacobian took {}'.format(time() - t))
             identity = spw.eye(A_soft.shape[0])
             A_soft = A_soft.row_join(identity)
 
@@ -114,10 +115,10 @@ class QProblemBuilder(object):
             self.cython_big_ass_M = spw.speed_up(self.big_ass_M, self.free_symbols, backend=BACKEND)
             if function_hash is not None:
                 safe_compiled_function(self.cython_big_ass_M, self.path_to_functions + function_hash)
-            print('autowrap took {}'.format(time() - t))
+            self.__print_fn('autowrap took {}'.format(time() - t))
         else:
-            print('controller loaded {}'.format(self.path_to_functions + function_hash))
-        print('controller ready {}s'.format(time() - t_total))
+            self.__print_fn('controller loaded {}'.format(self.path_to_functions + function_hash))
+        self.__print_fn('controller ready {}s'.format(time() - t_total))
 
     def save_pickle(self, hash, f):
         with open('/tmp/{}'.format(hash), 'w') as file:
@@ -180,5 +181,5 @@ class QProblemBuilder(object):
         if xdot_full is None:
             return None
         # TODO enable debug print in an elegant way
-        # self.debug_print(np_H, np_A, np_lb, np_ub, np_lbA, np_ubA, xdot_full)
+        # self.debug_self.__print_fn(np_H, np_A, np_lb, np_ub, np_lbA, np_ubA, xdot_full)
         return OrderedDict((observable, xdot_full[i]) for i, observable in enumerate(self.controlled_joints_strs))
