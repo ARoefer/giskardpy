@@ -10,8 +10,11 @@ from giskardpy.utils import to_list, georg_slerp
 
 class InputArray(object):
     def __init__(self, **kwargs):
+        self._symbols = {}
         for param_name, identifier in kwargs.items():
-            setattr(self, param_name, sw.Symbol(str(identifier)))
+            symbol = sw.Symbol(str(identifier))
+            setattr(self, param_name, symbol)
+            self._symbols[param_name] = symbol
 
 
 class JointStatesInput(InputArray):
@@ -46,14 +49,39 @@ class Point3Input(InputArray):
 
     @classmethod
     def prefix(cls, f, prefix):
-        return cls(x=f(prefix + ['0']),
-                   y=f(prefix + ['1']),
-                   z=f(prefix + ['2']))
-
+        if isinstance(prefix, str):
+            return cls(x=f('{}/x'.format(prefix)),
+                       y=f('{}/y'.format(prefix)),
+                       z=f('{}/z'.format(prefix)))
+        else:
+            return cls(x=f(prefix + ['x']),
+                       y=f(prefix + ['y']),
+                       z=f(prefix + ['z']))
 
 class Vector3Input(Point3Input):
     def get_expression(self):
         return sw.vector3(self.x, self.y, self.z)
+
+
+class QuaternionInput(InputArray):
+    def __init__(self, qx='', qy='', qz='', qw=''):
+        super(QuaternionInput, self).__init__(qx=qx, qy=qy, qz=qz, qw=qw)
+
+    @classmethod
+    def prefix_constructor(self, f, prefix):
+        if isinstance(prefix, str):
+            return cls(qx=f('{}/x'.format(prefix)),
+                       qy=f('{}/y'.format(prefix)),
+                       qz=f('{}/z'.format(prefix)),
+                       qw=f('{}/w'.format(prefix)))
+        else:
+            return cls(qx=f(prefix + ['x']),
+                       qy=f(prefix + ['y']),
+                       qz=f(prefix + ['z']),
+                       qw=f(prefix + ['w']))        
+
+    def get_expression(self):
+        return sw.rotation3_quaternion(self.qx, self.qy, self.qz, self.qw)
 
 
 class FrameInput(InputArray):

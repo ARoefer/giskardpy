@@ -30,6 +30,10 @@ class SymEngineController(object):
                                              self.controlled_joints)
         self.hard_constraints = OrderedDict(((self.robot.get_name(), k), self.robot.hard_constraints[k]) for k in
                                             self.controlled_joints if k in self.robot.hard_constraints)
+        print('Joint Constraints:')
+        print('\n'.join(['{}:\n  lb {}: {}\n  ub {}: {}'.format(sc, type(c.lower), str(c.lower), type(c.upper), str(c.upper)) for sc, c in self.joint_constraints.items()]))
+        print('Hard Constraints:')
+        print('\n'.join(['{}:\n  lb {}: {}\n  ub {}: {}\n   e {}: {}'.format(sc, type(c.lower), str(c.lower), type(c.upper), str(c.upper), type(c.expression), str(c.expression)) for sc, c in self.hard_constraints.items()]))
 
     def init(self, soft_constraints, free_symbols, print_fn=print_wrapper):
         self.qp_problem_builder = QProblemBuilder(self.joint_constraints,

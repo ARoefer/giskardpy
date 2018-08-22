@@ -287,6 +287,14 @@ def trans_of(frame):
 def rot_of(frame):
     return frame[:4, :3].row_join(sp.Matrix([0, 0, 0, 1]))
 
+def x_of(frame):
+    return frame[:4, :1]
+
+def y_of(frame):
+    return frame[:4, 1:2]
+
+def z_of(frame):
+    return frame[:4, 2:3]
 
 def trace(matrix):
     return sum(matrix[i, i] for i in range(matrix.shape[0]))
@@ -364,48 +372,12 @@ def quaternion_from_rpy(roll, pitch, yaw):
 
 
 def quaternion_from_matrix(matrix):
-    q = Matrix([0, 0, 0, 0])
-    M = Matrix(matrix)
-    t = trace(M)
-
-    if0 = t - M[3, 3]
-
-    if1 = M[1, 1] - M[0, 0]
-
-    m_i_i = if_greater_zero(if1, M[1, 1], M[0, 0])
-    m_j_j = if_greater_zero(if1, M[2, 2], M[1, 1])
-    m_k_k = if_greater_zero(if1, M[0, 0], M[2, 2])
-
-    m_i_j = if_greater_zero(if1, M[1, 2], M[0, 1])
-    m_j_i = if_greater_zero(if1, M[2, 1], M[1, 0])
-    m_k_i = if_greater_zero(if1, M[0, 1], M[2, 0])
-    m_i_k = if_greater_zero(if1, M[1, 0], M[0, 2])
-    m_k_j = if_greater_zero(if1, M[0, 2], M[2, 1])
-    m_j_k = if_greater_zero(if1, M[2, 0], M[1, 2])
-
-    if2 = M[2, 2] - m_i_i
-
-    m_i_i = if_greater_zero(if2, M[2, 2], m_i_i)
-    m_j_j = if_greater_zero(if2, M[0, 0], m_j_j)
-    m_k_k = if_greater_zero(if2, M[1, 1], m_k_k)
-
-    m_i_j = if_greater_zero(if2, M[2, 0], m_i_j)
-    m_j_i = if_greater_zero(if2, M[0, 2], m_j_i)
-    m_k_i = if_greater_zero(if2, M[1, 2], m_k_i)
-    m_i_k = if_greater_zero(if2, M[2, 1], m_i_k)
-    m_k_j = if_greater_zero(if2, M[1, 0], m_k_j)
-    m_j_k = if_greater_zero(if2, M[0, 1], m_j_k)
-
-    t2 = m_i_i - (m_j_j + m_k_k) + M[3, 3]
-    q[0] = if_greater_zero(if0, M[2, 1] - M[1, 2],
-                           if_greater_zero(if2, m_i_j + m_j_i, if_greater_zero(if1, m_k_i + m_i_k, t2)))
-    q[1] = if_greater_zero(if0, M[0, 2] - M[2, 0],
-                           if_greater_zero(if2, m_k_i + m_i_k, if_greater_zero(if1, t2, m_i_j + m_j_i)))
-    q[2] = if_greater_zero(if0, M[1, 0] - M[0, 1],
-                           if_greater_zero(if2, t2, if_greater_zero(if1, m_i_j + m_j_i, m_k_i + m_i_k)))
-    q[3] = if_greater_zero(if0, t, m_k_j - m_j_k)
-    q *= if_greater_zero(if0, 0.5 / sp.sqrt(t * M[3, 3]), 0.5 / sp.sqrt(t2 * M[3, 3]))
-    return q
+    w  = sp.sqrt(1 + matrix[0,0] + matrix[1,1] + matrix[2,2]) * 0.5
+    w4 = 4 * w
+    x  = (matrix[2,1] - matrix[1,2]) / w4
+    y  = (matrix[0,2] - matrix[2,0]) / w4
+    z  = (matrix[1,0] - matrix[0,1]) / w4
+    return sp.Matrix([x,y,z,w])
 
 
 def quaternion_multiply(q1, q2):

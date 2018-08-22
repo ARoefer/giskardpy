@@ -7,7 +7,7 @@ from giskardpy.input_system import JointStatesInput
 from giskardpy.qp_problem_builder import HardConstraint, JointConstraint
 
 Joint = namedtuple('Joint', ['symbol', 'velocity_limit', 'lower', 'upper', 'type', 'frame'])
-Gripper = namedtuple('Gripper', ['name', 'pose', 'opening', 'height', 'max_opening', 'link_name'])
+Gripper = namedtuple('Gripper', ['name', 'pose', 'opening', 'height', 'max_opening', 'link_name', 'reach', 'pivot_position'])
 Camera = namedtuple('Camera', ['name', 'pose', 'hfov', 'near', 'far'])
 
 def hacky_urdf_parser_fix(urdf_str):
