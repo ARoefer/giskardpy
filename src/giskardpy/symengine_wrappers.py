@@ -373,6 +373,8 @@ def quaternion_from_rpy(roll, pitch, yaw):
 
 def quaternion_from_matrix(matrix):
     w  = sp.sqrt(1 + matrix[0,0] + matrix[1,1] + matrix[2,2]) * 0.5
+    if type(w) == sp.ComplexDouble:
+        print('Complex w in quaternion! Result of sqrt({})'.format(str(1 + matrix[0,0] + matrix[1,1] + matrix[2,2])))
     w4 = 4 * w
     x  = (matrix[2,1] - matrix[1,2]) / w4
     y  = (matrix[0,2] - matrix[2,0]) / w4

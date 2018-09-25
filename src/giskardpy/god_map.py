@@ -9,11 +9,12 @@ class GodMap(object):
     def __init__(self):
         self._data = {}
         self.separator = '/'
-        self.expr_separator = '_'
+        self.expr_separator = '__'
         self.key_to_expr = {}
         self.expr_to_key = {}
         self.default_value = 0
         self.last_expr_values = {}
+        self.changed_keys = set()
 
     def __copy__(self):
         god_map_copy = GodMap()
@@ -70,9 +71,9 @@ class GodMap(object):
                 pass
             except KeyError as e:
                 # TODO is this really a good idea?
-                # traceback.print_exc()
-                # raise KeyError(key)
-                result = self.default_value
+                traceback.print_exc()
+                raise KeyError(key)
+                #result = self.default_value
         if callable(result):
             return result(self)
         else:

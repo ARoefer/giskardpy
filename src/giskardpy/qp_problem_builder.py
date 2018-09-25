@@ -152,7 +152,7 @@ class QProblemBuilder(object):
         row_names = self.hard_constraints_dict.keys() + self.soft_constraints_dict.keys()
 
         self.str_A  = pretty_matrix_format_str(col_names, row_names, min_col_width=20)
-        self.str_b  = pretty_matrix_format_str(['lb',   'ub'], self.controlled_joints_strs + self.soft_constraints_dict.keys(), min_col_width=20)
+        self.str_b  = pretty_matrix_format_str(['lb', 'ub'], self.controlled_joints_strs + self.soft_constraints_dict.keys(), min_col_width=20)
         self.str_bA = pretty_matrix_format_str(['lbA', 'ubA'], self.hard_constraints_dict.keys() + self.soft_constraints_dict.keys(), min_col_width=20)
         self.str_xdot = pretty_matrix_format_str(['xdot'], col_names[:len(self.controlled_joints_strs)], min_col_width=20)
 
@@ -233,14 +233,14 @@ class QProblemBuilder(object):
 
         # self.__print_fn()
         # self.__print_fn('{}\n\n{}\n\n{}\n'.format(
-        #         format_matrix(np.concatenate((self.np_lbA.reshape(len(self.np_lbA), 1),
-        #                                       self.np_ubA.reshape(len(self.np_lbA), 1)), axis=1), self.str_bA),
+        # self.__print_fn(format_matrix(np.concatenate((self.np_lbA.reshape(len(self.np_lbA), 1),
+        #                                       self.np_ubA.reshape(len(self.np_lbA), 1)), axis=1), self.str_bA))#,
         #         '\n'.join(['{:>30}: {:>20} {:>20} {:>20}'.format(n, 
         #                                                            subs_if_sym(c.lower, substitutions),
         #                                                            subs_if_sym(c.upper, substitutions),
         #                                                            subs_if_sym(c.expression, substitutions)) for n, c in self.soft_constraints_dict.items()]),
-        #         # format_matrix(np.concatenate((np_lb.reshape(len(np_lb), 1),
-        #         #                               np_ub.reshape(len(np_ub), 1)), axis=1), self.str_b),
+        # self.__print_fn(format_matrix(np.concatenate((np_lb.reshape(len(np_lb), 1),
+        #                               np_ub.reshape(len(np_ub), 1)), axis=1), self.str_b))
         #         format_matrix(np.array([[xdot_full[x]] for x in range(len(self.controlled_joints_strs))]), self.str_xdot)))
         return OrderedDict((observable, xdot_full[i]) for i, observable in enumerate(self.controlled_joints_strs))
 
@@ -255,3 +255,9 @@ class QProblemBuilder(object):
                 if self.np_lbA[x] > lbThreshold or self.np_ubA[x] < ubThreshold:
                     return False
         return True
+
+    def get_a_bounds(self, name):
+        if name in self.soft_constraint_indices:
+            x = self.soft_constraint_indices[name]
+            return (self.np_lbA[x], self.np_ubA[x])
+        raise Exception('Soft constraint "{}" does not exist.'.format(name))

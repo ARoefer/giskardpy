@@ -84,6 +84,25 @@ class QuaternionInput(InputArray):
         return sw.rotation3_quaternion(self.qx, self.qy, self.qz, self.qw)
 
 
+class RPYInput(InputArray):
+    def __init__(self, r='', p='', y=''):
+        super(RPYInput, self).__init__(r=r, p=p, y=y)
+
+    @classmethod
+    def prefix_constructor(cls, f, prefix):
+        if isinstance(prefix, str):
+            return cls(r=f('{}/r'.format(prefix)),
+                       p=f('{}/p'.format(prefix)),
+                       y=f('{}/y'.format(prefix)))
+        else:
+            return cls(r=f(prefix + ['r']),
+                       p=f(prefix + ['p']),
+                       y=f(prefix + ['y']))        
+
+    def get_expression(self):
+        return sw.rotation3_rpy(self.r, self.p, self.y)
+
+
 class FrameInput(InputArray):
     def __init__(self, x='', y='', z='', qx='', qy='', qz='', qw=''):
         super(FrameInput, self).__init__(x=x, y=y, z=z, qx=qx, qy=qy, qz=qz, qw=qw)
