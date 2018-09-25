@@ -1,21 +1,22 @@
 # giskardpy
 The core python library of the Giskard framework for constraint- and optimization-based robot motion control.
 
-## Installation instructions for 16.04/kinetic
+## Installation instructions
 
-First install symengine + symengine.py
+If you are on Ubuntu 14.04(Trusty) add the LLVM repositories to your package list by running
 ```
-sudo apt-get install llvm-4.0-dev
-git clone https://github.com/symengine/symengine.git
-git clone https://github.com/symengine/symengine.py.git
-cd symengine
-git checkout `cat ../symengine.py/symengine_version.txt`
-cmake -DWITH_LLVM:BOOL=ON .
-make
-sudo make install
-cd ../symengine.py
-sudo python setup.py install
+sudo add-apt-repository "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-6.0 main"
+sudo add-apt-repository "deb-src http://apt.llvm.org/trusty/ llvm-toolchain-trusty-6.0 main"
 ```
+
+Install symengine + symengine.py by running 
+```
+wget https://raw.githubusercontent.com/ARoefer/giskardpy/gebsyas/install_symengine.sh
+install_symengine.sh
+```
+in a location of your choosing. The script will install LLVM 6.0, clone the symengine repositories to your selected location and automatically build them. 
+
+*A reboot may be necessary for Python to find the symengine libraries.*
 
 Install pybullet:
 ```
