@@ -229,12 +229,12 @@ class QProblemBuilder(object):
         if xdot_full is None:
             return None
         # TODO enable debug print in an elegant way
-        # self.debug_print(np_H, np_A, np_lb, np_ub, np_lbA, np_ubA, xdot_full)
+        #self.debug_print(np_H, np_A, np_lb, np_ub, self.np_lbA, self.np_ubA, xdot_full)
 
         # self.__print_fn()
         # self.__print_fn('{}\n\n{}\n\n{}\n'.format(
-        # self.__print_fn(format_matrix(np.concatenate((self.np_lbA.reshape(len(self.np_lbA), 1),
-        #                                       self.np_ubA.reshape(len(self.np_lbA), 1)), axis=1), self.str_bA))#,
+        self.__print_fn(format_matrix(np.concatenate((self.np_lbA.reshape(len(self.np_lbA), 1),
+                                               self.np_ubA.reshape(len(self.np_lbA), 1)), axis=1), self.str_bA))#,
         #         '\n'.join(['{:>30}: {:>20} {:>20} {:>20}'.format(n, 
         #                                                            subs_if_sym(c.lower, substitutions),
         #                                                            subs_if_sym(c.upper, substitutions),

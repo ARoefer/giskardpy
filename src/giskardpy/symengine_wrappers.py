@@ -221,10 +221,13 @@ def rotation3_rpy(roll, pitch, yaw):
     return (rz * ry * rx)
 
 
-def rotation3_axis_angle(axis, angle):
+def rotation3_axis_angle(axis, angle=None):
     """ Conversion of unit axis and angle to 4x4 rotation matrix according to:
         http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToMatrix/index.htm
     """
+    if not angle:
+        angle = norm(axis)
+
     ct = sp.cos(angle)
     st = sp.sin(angle)
     vt = 1 - ct
@@ -311,12 +314,16 @@ def rotation_distance(rotation_matrix1, rotation_matrix2):
 
 def axis_angle_from_matrix(rotation_matrix):
     rm = rotation_matrix
+    if 1 - rm[0,0] <= 0.0001 and 1 - rm[1,1] <= 0.0001 and 1 - rm[2,2] <= 0.0001:
+        return unitX, 0
+    
     angle = (trace(rm[:3, :3]) - 1) / 2
     angle = sp.acos(angle)
     x = (rm[2, 1] - rm[1, 2])
     y = (rm[0, 2] - rm[2, 0])
     z = (rm[1, 0] - rm[0, 1])
     n = sp.sqrt(x * x + y * y + z * z)
+
 
     axis = sp.Matrix([x / n, y / n, z / n])
     return axis, angle
