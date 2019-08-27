@@ -119,7 +119,7 @@ class Robot(object):
                 lower_limit = joint.safety_controller.soft_lower_limit
                 upper_limit = joint.safety_controller.soft_upper_limit
             else:
-                if joint.limit is not None:
+                if joint.limit is not None and joint.type != 'continuous':
                     lower_limit = joint.limit.lower if joint.limit.lower is not None else None
                     upper_limit = joint.limit.upper if joint.limit.upper is not None else None
                 else:
