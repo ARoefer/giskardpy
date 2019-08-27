@@ -114,7 +114,7 @@ class CompiledFunction(object):
             self.fast_f.unsafe_real(np.array(filtered_args, dtype=np.double), out)
             return np.nan_to_num(out).reshape(self.shape)
         except KeyError as e:
-            raise SymengineException('{}\ntry deleting the last loaded compiler to trigger recompilation'.format(e.message))
+            raise SymengineException('Parameter "{}" not found in passed kwargs. Try deleting the last loaded compiler to trigger recompilation. Passed kwargs:\n  {{}}'.format(e.message, '\n  '.join(['{}: {}'.format(k, v) for k, v in kwargs.items()])))
 
 
 # @profile
@@ -221,13 +221,10 @@ def rotation3_rpy(roll, pitch, yaw):
     return (rz * ry * rx)
 
 
-def rotation3_axis_angle(axis, angle=None):
+def rotation3_axis_angle(axis, angle):
     """ Conversion of unit axis and angle to 4x4 rotation matrix according to:
         http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToMatrix/index.htm
     """
-    if not angle:
-        angle = norm(axis)
-
     ct = sp.cos(angle)
     st = sp.sin(angle)
     vt = 1 - ct
