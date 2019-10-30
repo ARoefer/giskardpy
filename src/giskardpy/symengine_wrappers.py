@@ -322,7 +322,7 @@ def axis_angle_from_matrix(rotation_matrix):
     n = sp.sqrt(x * x + y * y + z * z)
 
 
-    axis = sp.Matrix([x / n, y / n, z / n])
+    axis = vector3(x / n, y / n, z / n)
     return axis, angle
 
 
